@@ -17,7 +17,7 @@ const expressionCalculator = (str) => {
       }
   }
   const operators = Object.keys(operations);
-  const processExpression = (expr) => {
+  const funcSearch = (expr) => {
       for (let operator of operators) {
           let regexPattern = `(?!^)(?<!\\${operators.map(el => '\\' + el).join('|')})\\${operator}`;
           let search = [...expr.matchAll(new RegExp(regexPattern, 'g'))];
@@ -25,7 +25,7 @@ const expressionCalculator = (str) => {
           if (matchedOperation) {
               let x = expr.slice(0, matchedOperation.index);
               let y = expr.slice(matchedOperation.index + 1);
-              return y ? operations[matchedOperation[0]](processExpression(x), processExpression(y)) : x;
+              return y ? operations[matchedOperation[0]](funcSearch(x), funcSearch(y)) : x;
           }
       }
       return +expr;
@@ -40,7 +40,7 @@ const expressionCalculator = (str) => {
                   throw 'ExpressionError: Brackets must be paired';
               }
               let toCalculate = str.slice(arr[arr.length - 1] + 1, i);
-              let calculated = processExpression(toCalculate);
+              let calculated = funcSearch(toCalculate);
               str = str.slice(0, arr[arr.length - 1]) + calculated + str.slice(i + 1);
               i = arr.pop();
           } else if (str[i] === '(') {
@@ -50,7 +50,7 @@ const expressionCalculator = (str) => {
       if (arr.length) {
           throw 'ExpressionError: Brackets must be paired';
       }
-      return processExpression(str);
+      return funcSearch(str);
   }
   return calculate(str);
 }
